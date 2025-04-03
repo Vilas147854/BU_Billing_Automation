@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Bill Automate</title>
+</head>
+<body>
+    {% extends "base.html" %}
+{% block title %}Home - Bill Automate{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Welcome to Bill Automate</h1>
+                            <p class="mb-4">Streamline your faculty billing and attendance management.</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="{{ url_for('login') }}" class="btn btn-primary btn-user btn-block">Login</a>
+                            <hr>
+                            <a href="{{ url_for('register') }}" class="btn btn-secondary btn-user btn-block">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+</body>
+</html>
