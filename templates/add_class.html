@@ -15,18 +15,34 @@
                     <h6 class="m-0 font-weight-bold text-primary">Add Class</h6>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" id="addClassForm">
+                        <div class="form-group">
+                            <label>Dairy No.</label>
+                            <input type="number" class="form-control" name="dairy_no" placeholder="Enter Dairy Number" required>
+                        </div>
                         <div class="form-group">
                             <label>Date</label>
                             <input type="date" class="form-control" name="date" required>
                         </div>
                         <div class="form-group">
                             <label>Subject</label>
-                            <input type="text" class="form-control" name="subject" placeholder="e.g., Theory of Computation" required>
+                            <select class="form-control" name="subject" id="subjectSelect" required>
+                                <option value="Theory of Computation">Theory of Computation</option>
+                                <option value="Big Data">Big Data</option>
+                                <option value="Object Oriented Programming Lab">Object Oriented Programming Lab</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" class="form-control mt-2" name="custom_subject" id="customSubject" placeholder="Enter custom subject" style="display: none;">
                         </div>
                         <div class="form-group">
                             <label>Subject Code</label>
-                            <input type="text" class="form-control" name="subject_code" placeholder="e.g., 1MCA4" required>
+                            <select class="form-control" name="subject_code" id="subjectCodeSelect" required>
+                                <option value="1MCA4">1MCA4</option>
+                                <option value="3MCA5">3MCA5</option>
+                                <option value="1MCA8">1MCA8</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" class="form-control mt-2" name="custom_subject_code" id="customSubjectCode" placeholder="Enter custom subject code" style="display: none;">
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -34,11 +50,17 @@
                         </div>
                         <div class="form-group">
                             <label>Actual Hours</label>
-                            <input type="number" class="form-control" name="actual_hours" placeholder="e.g., 4" required>
+                            <select class="form-control" name="actual_hours" id="actualHours" required>
+                                <option value="2">2</option>
+                                <option value="4">4</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Claiming Hours</label>
-                            <input type="number" class="form-control" name="claiming_hours" placeholder="e.g., 3" required>
+                            <select class="form-control" name="claiming_hours" id="claimingHours" required>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Class</button>
                         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary ml-2">Back to Dashboard</a>
@@ -47,6 +69,42 @@
             </div>
         </div>
     </div>
+    <script>
+        // Toggle custom subject input
+        document.getElementById('subjectSelect').addEventListener('change', function() {
+            const customSubjectInput = document.getElementById('customSubject');
+            if (this.value === 'Other') {
+                customSubjectInput.style.display = 'block';
+                customSubjectInput.required = true;
+            } else {
+                customSubjectInput.style.display = 'none';
+                customSubjectInput.required = false;
+            }
+        });
+
+        // Toggle custom subject code input
+        document.getElementById('subjectCodeSelect').addEventListener('change', function() {
+            const customSubjectCodeInput = document.getElementById('customSubjectCode');
+            if (this.value === 'Other') {
+                customSubjectCodeInput.style.display = 'block';
+                customSubjectCodeInput.required = true;
+            } else {
+                customSubjectCodeInput.style.display = 'none';
+                customSubjectCodeInput.required = false;
+            }
+        });
+
+        // Update claiming hours based on actual hours
+        document.getElementById('actualHours').addEventListener('change', function() {
+            const actualHours = parseInt(this.value);
+            const claimingHoursSelect = document.getElementById('claimingHours');
+            if (actualHours === 4) {
+                claimingHoursSelect.value = '3';
+            } else if (actualHours === 2) {
+                claimingHoursSelect.value = '2';
+            }
+        });
+    </script>
 {% endblock %}
 </body>
 </html>

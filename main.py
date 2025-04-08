@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, send_file, session
+from flask import Flask, render_template, redirect, url_for, request, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -23,7 +23,6 @@ login_manager.login_view = "login"
 
 with app.app_context():
     db.create_all()
-    # Create an admin user if none exists
     if not User.query.filter_by(is_admin=True).first():
         admin = User(
             name="Admin", email="admin@example.com",
@@ -35,7 +34,7 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 @app.route("/")
 def home():
@@ -112,15 +111,18 @@ def dashboard():
 @login_required
 def add_class():
     if request.method == 'POST':
+        dairy_no = int(request.form['dairy_no'])
         date = datetime.strptime(request.form['date'], '%Y-%m-%d')
-        subject = request.form['subject']
-        subject_code = request.form['subject_code']
+        subject = request.form['subject'] if request.form['subject'] != 'Other' else request.form['custom_subject']
+        subject_code = request.form['subject_code'] if request.form['subject_code'] != 'Other' else request.form['custom_subject_code']
         description = request.form['description']
         actual_hours = int(request.form['actual_hours'])
         claiming_hours = int(request.form['claiming_hours'])
 
-        last_dairy_no = db.session.query(db.func.max(ClassDetails.dairy_no)).scalar()
-        dairy_no = (last_dairy_no or 0) + 1
+        # Check if dairy_no already exists
+        if ClassDetails.query.filter_by(dairy_no=dairy_no).first():
+            flash("Dairy number already exists. Please use a unique number.", "danger")
+            return render_template('add_class.html')
 
         new_class = ClassDetails(
             dairy_no=dairy_no, faculty_id=current_user.id, date=date, subject=subject,
@@ -190,10 +192,8 @@ def admin():
             db.session.commit()
             flash("Attendance updated!", "success")
     
-    # Fetch pending users
     pending_users = User.query.filter_by(is_approved=False).all()
-    
-    # Fetch all classes with faculty names
+    approved_users = User.query.filter_by(is_approved=True).filter(User.is_admin == False).all()
     all_classes = ClassDetails.query.all()
     class_data = [
         {
@@ -208,8 +208,6 @@ def admin():
             'claiming_hours': cls.claiming_hours
         } for cls in all_classes
     ]
-    
-    # Fetch all attendance with faculty names
     all_attendance = Attendance.query.all()
     attendance_data = [
         {
@@ -220,7 +218,7 @@ def admin():
         } for att in all_attendance
     ]
     
-    return render_template('admin.html', pending_users=pending_users, classes=class_data, attendance=attendance_data)
+    return render_template('admin.html', pending_users=pending_users, approved_users=approved_users, classes=class_data, attendance=attendance_data)
 
 @app.route('/generate_bill/<int:year>/<int:month>')
 @login_required

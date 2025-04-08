@@ -6,145 +6,180 @@
 </head>
 <body>
     {% extends "base.html" %}
-    {% block title %}Admin Panel - Bill Automate{% endblock %}
-    {% block content %}
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Admin Panel</h1>
-        </div>
-        <div class="row">
-            <div class="col-xl-12 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Pending User Approvals</h6>
-                    </div>
-                    <div class="card-body">
-                        {% if pending_users %}
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+{% block title %}Admin Panel - Bill Automate{% endblock %}
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Admin Panel</h1>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Pending User Approvals</h6>
+                </div>
+                <div class="card-body">
+                    {% if pending_users %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in pending_users %}
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Department</th>
-                                            <th>Action</th>
+                                            <td>{{ user.name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.department }}</td>
+                                            <td>
+                                                <form method="POST">
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <button type="submit" name="approve_user" class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for user in pending_users %}
-                                            <tr>
-                                                <td>{{ user.name }}</td>
-                                                <td>{{ user.email }}</td>
-                                                <td>{{ user.department }}</td>
-                                                <td>
-                                                    <form method="POST">
-                                                        <input type="hidden" name="user_id" value="{{ user.id }}">
-                                                        <button type="submit" name="approve_user" class="btn btn-success btn-sm">Approve</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-gray-600">No pending approvals.</p>
-                        {% endif %}
-                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-600">No pending approvals.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-12 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Edit Class Details</h6>
-                    </div>
-                    <div class="card-body">
-                        {% if classes %}
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Approved Users</h6>
+                </div>
+                <div class="card-body">
+                    {% if approved_users %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in approved_users %}
                                         <tr>
-                                            <th>Dairy No.</th>
-                                            <th>Faculty</th>
-                                            <th>Date</th>
-                                            <th>Subject</th>
-                                            <th>Subject Code</th>
-                                            <th>Description</th>
-                                            <th>Actual Hours</th>
-                                            <th>Claiming Hours</th>
-                                            <th>Action</th>
+                                            <td>{{ user.name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.department }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for cls in classes %}
-                                            <tr>
-                                                <td>{{ cls.dairy_no }}</td>
-                                                <td>{{ cls.faculty_name }}</td>
-                                                <td>
-                                                    <form method="POST">
-                                                        <input type="hidden" name="class_id" value="{{ cls.id }}">
-                                                        <input type="date" name="date" value="{{ cls.date.strftime('%Y-%m-%d') }}" class="form-control" required>
-                                                </td>
-                                                <td><input type="text" name="subject" value="{{ cls.subject }}" class="form-control" required></td>
-                                                <td><input type="text" name="subject_code" value="{{ cls.subject_code }}" class="form-control" required></td>
-                                                <td><textarea name="description" class="form-control" required>{{ cls.description }}</textarea></td>
-                                                <td><input type="number" name="actual_hours" value="{{ cls.actual_hours }}" class="form-control" required></td>
-                                                <td><input type="number" name="claiming_hours" value="{{ cls.claiming_hours }}" class="form-control" required></td>
-                                                <td><button type="submit" name="edit_class" class="btn btn-primary btn-sm">Save</button></form></td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-gray-600">No classes recorded.</p>
-                        {% endif %}
-                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-600">No approved users yet.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-12 col-lg-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Edit Attendance</h6>
-                    </div>
-                    <div class="card-body">
-                        {% if attendance %}
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Edit Class Details</h6>
+                </div>
+                <div class="card-body">
+                    {% if classes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Dairy No.</th>
+                                        <th>Faculty</th>
+                                        <th>Date</th>
+                                        <th>Subject</th>
+                                        <th>Subject Code</th>
+                                        <th>Description</th>
+                                        <th>Actual Hours</th>
+                                        <th>Claiming Hours</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cls in classes %}
                                         <tr>
-                                            <th>Faculty</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <td>{{ cls.dairy_no }}</td>
+                                            <td>{{ cls.faculty_name }}</td>
+                                            <td>
+                                                <form method="POST">
+                                                    <input type="hidden" name="class_id" value="{{ cls.id }}">
+                                                    <input type="date" name="date" value="{{ cls.date.strftime('%Y-%m-%d') }}" class="form-control" required>
+                                            </td>
+                                            <td><input type="text" name="subject" value="{{ cls.subject }}" class="form-control" required></td>
+                                            <td><input type="text" name="subject_code" value="{{ cls.subject_code }}" class="form-control" required></td>
+                                            <td><textarea name="description" class="form-control" required>{{ cls.description }}</textarea></td>
+                                            <td><input type="number" name="actual_hours" value="{{ cls.actual_hours }}" class="form-control" required></td>
+                                            <td><input type="number" name="claiming_hours" value="{{ cls.claiming_hours }}" class="form-control" required></td>
+                                            <td><button type="submit" name="edit_class" class="btn btn-primary btn-sm">Save</button></form></td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for att in attendance %}
-                                            <tr>
-                                                <td>{{ att.faculty_name }}</td>
-                                                <td>
-                                                    <form method="POST">
-                                                        <input type="hidden" name="att_id" value="{{ att.id }}">
-                                                        <input type="date" name="date" value="{{ att.date.strftime('%Y-%m-%d') }}" class="form-control" required>
-                                                </td>
-                                                <td><input type="text" name="status" value="{{ att.status }}" class="form-control" required></td>
-                                                <td><button type="submit" name="edit_attendance" class="btn btn-primary btn-sm">Save</button></form></td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-gray-600">No attendance recorded.</p>
-                        {% endif %}
-                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-600">No classes recorded.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    {% endblock %}
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Edit Attendance</h6>
+                </div>
+                <div class="card-body">
+                    {% if attendance %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Faculty</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in attendance %}
+                                        <tr>
+                                            <td>{{ att.faculty_name }}</td>
+                                            <td>
+                                                <form method="POST">
+                                                    <input type="hidden" name="att_id" value="{{ att.id }}">
+                                                    <input type="date" name="date" value="{{ att.date.strftime('%Y-%m-%d') }}" class="form-control" required>
+                                            </td>
+                                            <td><input type="text" name="status" value="{{ att.status }}" class="form-control" required></td>
+                                            <td><button type="submit" name="edit_attendance" class="btn btn-primary btn-sm">Save</button></form></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-600">No attendance recorded.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 </body>
 </html>
